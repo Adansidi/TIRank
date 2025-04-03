@@ -21,17 +21,14 @@ def binary_search_largest_smaller(arr, target):
     while left <= right:
         mid = (left + right) // 2
         if arr[mid] < target:
-            result = mid  # 如果当前元素小于目标值，则更新结果为当前下标
+            result = mid
             left = mid + 1
         else:
             right = mid - 1
 
     return result
 
-# 读取评分卡数据
 score_card = pd.read_csv(input_file.split('/')[-1].split('.')[0] + "_score_card.csv")
-
-# 读取fqdn属性数据
 fqdn_data = pd.read_csv(input_file.split('/')[-1].split('.')[0] + "_MATRIX.csv")
 
 score_dict = {}
@@ -50,15 +47,12 @@ for _, row in score_card.iterrows():
         score_dict[variable][1].append(score)
 
 
-# 初始化评分结果
 score_result_list = []
 
-# 对每个fqdn计算评分
 for index, row in fqdn_data.iterrows():
     fqdn_score = 0
 
-    # 对于每个属性，查找其对应的分箱和分=数
-    for col in fqdn_data.columns[1:]:  # 从第二列开始，第一列是fqdn
+    for col in fqdn_data.columns[1:]:
         if col not in score_dict:
             continue
         value = row[col]
@@ -67,8 +61,7 @@ for index, row in fqdn_data.iterrows():
         score_index = binary_search_largest_smaller(value_list, value)
         if score_index != -1:
             fqdn_score += score_list[score_index]
-
-    # 将fqdn及其评分添加到结果中
+            
     score_result_list.append({"domain": row["domain"], "Score": fqdn_score})
 
 score_result = pd.DataFrame(score_result_list)
