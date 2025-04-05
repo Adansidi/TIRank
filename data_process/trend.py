@@ -7,28 +7,17 @@ from sklearn.linear_model import LinearRegression
 import glob
 import pandas as pd
 
-# ---------- var define start ----------
+
 
 activation_parent_path = '../origin_data/activation'
 output_parent_path = '../activity/trend'
-# 原始 csv 文件名格式
+
 activation_pattern = f'activation_*.csv'
-# 新增黑名单&真实事件 csv 文件名格式
+
 increase_black_pr_activation_pattern = f'increase_black_pr_activation_*.csv'
 
 
-# activation_parent_path = '../origin_data/activation'
-# output_parent_path = '../activity/trend'
-# # 原始 csv 文件名格式
-# activation_pattern = f'activation_*.csv'
-# # 新增黑名单&真实事件 csv 文件名格式
-# increase_black_pr_activation_pattern = f'increase_black_pr_activation_*.csv'
 
-
-
-# ---------- var define end ----------
-
-# 读取domain_list中的每个文件，并将其中的fqdn或domain提取出来保存到一个集合domains中
 def read_domain_list(domain_list):
     domains = set()
     for file in domain_list:
@@ -46,15 +35,15 @@ def read_domain_list(domain_list):
 
 
 
-# 线性回归拟合
+
 def linear_regression_fit(x, y):
-    # print("开始进行线性回归拟合...")
+    
     x = np.array(x).reshape((-1, 1))
     model = LinearRegression().fit(x, y)
     return model.coef_[0]
 
 def read_activation_files(domains, sub_pattern, start_date, end_date):
-    # activation_files = glob.glob(f'{activation_parent_path}/activation_*.csv')
+    
     activation_files = glob.glob(f'{activation_parent_path}/{sub_pattern}')
     activation_data = {}
     for file in activation_files:
@@ -64,7 +53,7 @@ def read_activation_files(domains, sub_pattern, start_date, end_date):
             for index, row in df.iterrows():
                 domain = row['fqdn']
                 activation = row['activation']
-                # 如果domain不在domains中，不关注，跳过
+                
                 if domain not in domains:
                     continue
                 if domain not in activation_data:
@@ -94,19 +83,19 @@ def main():
 
     activation_parent_path = '../origin_data/activation'
     output_parent_path = '../activity/trend'
-    # 原始 csv 文件名格式
+    
     activation_pattern = f'{prefix}activation_*.csv'
-    # 新增黑名单&真实事件 csv 文件名格式
+    
     increase_black_pr_activation_pattern = f'increase_black_pr_activation_*.csv'
 
-    # 读取domain_list
+    
     domains = read_domain_list(args.domain_list)
-    # 读取 activation 数据
+    
     activation_data = read_activation_files(domains, activation_pattern, start_date, end_date)
-    # 读取新增黑名单&真实事件 activation 数据
+    
     increase_black_pr_activation_data = read_activation_files(domains, increase_black_pr_activation_pattern, start_date, end_date)
     activation_data.update(increase_black_pr_activation_data)
-    # 计算斜率并保存结果
+    
     results = []
     for domain in domains:
         if domain in activation_data:

@@ -3,17 +3,9 @@ import json
 import csv
 import os
 
-# ---------- var define start ----------
-
-# analyze_status_path = '../validity/analyze_status/allDomains_ns_zdns_cat.json'
-# output_parent_path = '../validity/analyze_status'
-
 analyze_status_path = ''
 output_parent_path = ''
 
-# ---------- var define end ----------
-
-# 读取domain_list中的每个文件，并将其中的fqdn或domain提取出来保存到一个集合domains中
 def read_domain_list(domain_list):
     domains = set()
     for file in domain_list:
@@ -29,7 +21,7 @@ def read_domain_list(domain_list):
                     domains.add(data['domain'])
     return domains
 
-# 从 analyze_status_path 中读取数据，判断域名是否为 NXDOMAIN
+
 def read_analyze_status(domains):
     domain_analyze_status = {}
     with open(analyze_status_path, 'r') as f:
@@ -65,17 +57,14 @@ def main():
     if prefix == "null":
         prefix = ""
 
-    # 读取 domain_list
     domains = read_domain_list(args.domain_list)
 
-    # TODO 注意，这里改了之后对于原来的代码有影响，如果想运行原来800w的则应该使用allDomains_ns_zdns_cat.json
-    # analyze_status_path = f'../validity/analyze_status/{prefix}ns_zdns_cat.json'
-    analyze_status_path = f'../validity/analyze_status/allDomains_ns_zdns_cat.json'
+
+    analyze_status_path = f'../validity/analyze_status/allDomains.json'
     output_parent_path = f'../validity/analyze_status'
-    # 读取 analyze_status
+
     domain_analyze_status = read_analyze_status(domains)
 
-    # 输出 analyze_status
     write_analyze_status(domain_analyze_status, args.timestamp, prefix)
 
 if __name__ == '__main__':

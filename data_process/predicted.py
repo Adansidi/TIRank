@@ -7,7 +7,7 @@ from sklearn.linear_model import LinearRegression
 import glob
 import pandas as pd
 
-# ---------- var define start ----------
+
 
 activation_parent_path = '../origin_data/activation'
 client_cnt_parent_path = '../origin_data/client_cnt'
@@ -17,18 +17,18 @@ predicted_client_cnt_parent_path = '../activity/predicted_client_cnt'
 predicted_request_cnt_sum_parent_path = '../activity/predicted_request_cnt_sum'
 predicted_activation_parent_path = '../activity/predicted_activation'
 
-# 原始 csv 文件名格式
+
 activation_pattern = f'activation_*.csv'
 request_cnt_sum_pattern = f'request_cnt_sum_*.csv'
 client_cnt_pattern = f'client_cnt_*.csv'
-# 新增黑名单&真实事件 csv 文件名格式
+
 increase_black_pr_client_cnt_pattern = f'increase_black_pr_client_cnt_*.csv'
 increase_black_pr_request_cnt_sum_pattern = f'increase_black_pr_request_cnt_sum_*.csv'
 increase_black_pr_activation_pattern = f'increase_black_pr_activation_*.csv'
 
-# ---------- var define end ----------
 
-# 读取domain_list中的每个文件，并将其中的fqdn或domain提取出来保存到一个集合domains中
+
+
 def read_domain_list(domain_list):
     domains = set()
     for file in domain_list:
@@ -45,7 +45,7 @@ def read_domain_list(domain_list):
     return domains
 
 def read_client_cnt_files(domains, sub_pattern, start_date, end_date):
-    # client_cnt_files = glob.glob(f'{client_cnt_parent_path}/client_cnt_*.csv')
+    
     client_cnt_files = glob.glob(f'{client_cnt_parent_path}/{sub_pattern}')
     client_cnt_data = {}
     for file in client_cnt_files:
@@ -63,7 +63,7 @@ def read_client_cnt_files(domains, sub_pattern, start_date, end_date):
     return client_cnt_data
 
 def read_request_cnt_sum_files(domains, sub_pattern, start_date, end_date):
-    # request_cnt_sum_files = glob.glob(f'{request_cnt_sum_parent_path}/request_cnt_sum_*.csv')
+    
     request_cnt_sum_files = glob.glob(f'{request_cnt_sum_parent_path}/{sub_pattern}')
     request_cnt_sum_data = {}
     for file in request_cnt_sum_files:
@@ -81,7 +81,7 @@ def read_request_cnt_sum_files(domains, sub_pattern, start_date, end_date):
     return request_cnt_sum_data
 
 def read_activation_files(domains, sub_pattern, start_date, end_date):
-    # activation_files = glob.glob(f'{activation_parent_path}/activation_*.csv')
+    
     activation_files = glob.glob(f'{activation_parent_path}/{sub_pattern}')
     activation_data = {}
     for file in activation_files:
@@ -103,14 +103,14 @@ def predict_next_data(origin_data, alpha):
     for domain, datas in origin_data.items():
         s = pd.Series(datas)
         ema = s.ewm(alpha=alpha, adjust=False).mean()
-        # 使用 shift 方法将 EMA 序列向后移动一位
+        
         ema_shifted = ema.shift(1)
-        # 使用 fillna 方法填充第一个 NaN 值
+        
         ema_shifted = ema_shifted.fillna(datas[0])
-        # 计算预测值
+        
         predicted = (ema_shifted * (1 - alpha)) + (s * alpha)
         predicted_data[domain] = predicted.tolist()
-        # print(predicted_data[domain])
+        
     return predicted_data
 
 def main():
@@ -140,11 +140,11 @@ def main():
     predicted_request_cnt_sum_parent_path = '../activity/predicted_request_cnt_sum'
     predicted_activation_parent_path = '../activity/predicted_activation'
 
-    # 原始 csv 文件名格式
+    
     activation_pattern = f'{prefix}activation_*.csv'
     request_cnt_sum_pattern = f'{prefix}request_cnt_sum_*.csv'
     client_cnt_pattern = f'{prefix}client_cnt_*.csv'
-    # 新增黑名单&真实事件 csv 文件名格式
+    
     increase_black_pr_client_cnt_pattern = f'increase_black_pr_client_cnt_*.csv'
     increase_black_pr_request_cnt_sum_pattern = f'increase_black_pr_request_cnt_sum_*.csv'
     increase_black_pr_activation_pattern = f'increase_black_pr_activation_*.csv'
@@ -157,24 +157,24 @@ def main():
     domain_list = args.domain_list
     domains = read_domain_list(domain_list)
 
-    print("start reading client_cnt files")
+    
     client_cnt_data = read_client_cnt_files(domains, client_cnt_pattern, start_date, end_date)
     increase_black_pr_client_cnt_data = read_client_cnt_files(domains, increase_black_pr_client_cnt_pattern, start_date, end_date)
     client_cnt_data.update(increase_black_pr_client_cnt_data)
-    print("start reading request_cnt_sum files")
+    
     request_cnt_sum_data = read_request_cnt_sum_files(domains, request_cnt_sum_pattern, start_date, end_date)
     increase_black_pr_request_cnt_sum_data = read_request_cnt_sum_files(domains, increase_black_pr_request_cnt_sum_pattern, start_date, end_date)
     request_cnt_sum_data.update(increase_black_pr_request_cnt_sum_data)
-    print("start reading activation files")
+    
     activation_data = read_activation_files(domains, activation_pattern, start_date, end_date)
     increase_black_pr_activation_data = read_activation_files(domains, increase_black_pr_activation_pattern, start_date, end_date)
     activation_data.update(increase_black_pr_activation_data)
 
-    print("start predicting client_cnt")
+    
     predicted_client_cnt = predict_next_data(client_cnt_data, alpha)
-    print("start predicting request_cnt_sum")
+    
     predicted_request_cnt_sum = predict_next_data(request_cnt_sum_data, alpha)
-    print("start predicting activation")
+    
     predicted_activation = predict_next_data(activation_data, alpha)
 
     with open(f'{predicted_client_cnt_parent_path}/{timestamp}_{prefix}predicted_client_cnt.csv', 'w') as f:

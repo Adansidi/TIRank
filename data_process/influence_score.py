@@ -8,17 +8,13 @@ import glob
 import pandas as pd
 from datetime import datetime, timedelta
 
-# ---------- var define start ----------
 
 activation_parent_path = '../origin_data/activation'
 output_parent_path = '../activity/influence_score'
 output_value_label = 'influence_score'
 activation_pattern = 'activation_*.csv'
-increase_black_pr_activation_pattern = 'increase_black_pr_activation_*.csv'
 
-# ---------- var define end ----------
 
-# 读取domain_list中的每个文件，并将其中的fqdn或domain提取出来保存到一个集合domains中
 def read_domain_list(domain_list):
     domains = set()
     for file in domain_list:
@@ -36,15 +32,13 @@ def read_domain_list(domain_list):
 
 
 
-# 线性回归拟合
 def linear_regression_fit(x, y):
-    print("开始进行线性回归拟合...")
     x = np.array(x).reshape((-1, 1))
     model = LinearRegression().fit(x, y)
     return model.coef_[0]
 
 def read_activation_files(domains, sub_pattern, start_date, end_date):
-    # activation_files = glob.glob(f'{activation_parent_path}/activation_*.csv')
+
     activation_files = glob.glob(f'{activation_parent_path}/{sub_pattern}')
     activation_data = {}
     for file in activation_files:
@@ -54,7 +48,6 @@ def read_activation_files(domains, sub_pattern, start_date, end_date):
             for index, row in df.iterrows():
                 domain = row['fqdn']
                 activation = row['activation']
-                # 如果domain不在domains中，不关注，跳过
                 if domain not in domains:
                     continue
                 if domain not in activation_data:
@@ -104,7 +97,6 @@ def main():
     output_parent_path = '../activity/influence_score'
     output_value_label = 'influence_score'
     activation_pattern = f'{prefix}activation_*.csv'
-    increase_black_pr_activation_pattern = 'increase_black_pr_activation_*.csv'
 
     start_date = int(args.start_date)
     end_date = int(args.end_date)
@@ -113,15 +105,12 @@ def main():
     timestamp = args.timestamp
 
 
-    # 读取domain_list
+
     domains = read_domain_list(domain_list)
-    # 读取 activation 数据
+
     activation_data = read_activation_files(domains, activation_pattern, start_date, end_date)
-    # 新增黑名单和威胁情报
-    increase_black_pr_activation_data = read_activation_files(domains, increase_black_pr_activation_pattern, start_date, end_date)
-    # 将两者合并到一起
-    activation_data.update(increase_black_pr_activation_data)
-    # 计算影响力分数
+
+
     influence_score = calculate_score(activation_data, G)
     write_csv_files(influence_score, output_parent_path, output_value_label, timestamp, prefix)
 

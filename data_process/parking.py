@@ -3,17 +3,9 @@ import json
 import csv
 import os
 
-# ---------- var define start ----------
-
-# parking_path = '../validity/parking/validity_parking_analyze.csv'
-# output_parent_path = '../validity/parking'
-
 parking_path = ''
 output_parent_path = ''
 
-# ---------- var define end ----------
-
-# 读取domain_list中的每个文件，并将其中的fqdn或domain提取出来保存到一个集合domains中
 def read_domain_list(domain_list):
     domains = set()
     for file in domain_list:
@@ -29,7 +21,7 @@ def read_domain_list(domain_list):
                     domains.add(data['domain'])
     return domains
 
-# 从 parking_path 中读取数据，并将domains中的每个元素与该文件中的fqdn进行匹配，如果匹配到了则保存到字典domain_parking中
+
 def read_parking(domains):
     domain_parking = {}
     with open(parking_path, 'r') as f:
@@ -39,7 +31,7 @@ def read_parking(domains):
                 domain_parking[row['FQDN']] = row['Parked']
     return domain_parking
 
-# 将domain_parking输出到../validity/parking/{$timestamp}_parking.csv中
+
 def write_parking(domain_parking, timestamp, prefix):
     with open(f'{output_parent_path}/{timestamp}_{prefix}parking.csv', 'w') as f:
         writer = csv.writer(f)
@@ -60,15 +52,15 @@ def main():
     if prefix == "null":
         prefix = ""
 
-    # 读取domain_list
+    
     domains = read_domain_list(args.domain_list)
 
     parking_path = f'../validity/parking/{prefix}validity_parking_analyze.csv'
     output_parent_path = '../validity/parking'
 
-    # 读取parking
+    
     domain_parking = read_parking(domains)
-    # 写入parking
+    
     write_parking(domain_parking, args.timestamp, prefix)
 
 if __name__ == '__main__':

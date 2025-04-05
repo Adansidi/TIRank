@@ -3,14 +3,10 @@ import json
 import csv
 import os
 
-# ---------- var define start ----------
 
-freq_path = '../validity/freq/all_maldomains_merged_with_blacklists.json'
+freq_path = '../validity/freq/blacklists.json'
 output_parent_path = '../validity/freq'
 
-# ---------- var define end ----------
-
-# 读取domain_list中的每个文件，并将其中的fqdn或domain提取出来保存到一个集合domains中
 def read_domain_list(domain_list):
     domains = set()
     for file in domain_list:
@@ -26,7 +22,7 @@ def read_domain_list(domain_list):
                     domains.add(data['domain'])
     return domains
 
-# 从freq_path中读取数据，
+
 def read_freq_data():
     all_domain_freq = {}
     with open(freq_path, 'r') as f:
@@ -49,7 +45,6 @@ def calculate_freq(domains):
     return domain_freq
 
 
-# 将domain_freq输出到../validity/freq/{$timestamp}_freq.csv中
 def write_freq(domain_freq, timestamp):
     with open(f'{output_parent_path}/{timestamp}_freq.csv', 'w') as f:
         writer = csv.writer(f)
@@ -63,11 +58,10 @@ def main():
     parser.add_argument('--timestamp', required=True, help='Timestamp string')
     args = parser.parse_args()
 
-    # 读取domain_list
     domains = read_domain_list(args.domain_list)
-    # 计算freq
+
     domain_freq = calculate_freq(domains)
-    # 写入freq
+
     write_freq(domain_freq, args.timestamp)
 
 if __name__ == '__main__':
